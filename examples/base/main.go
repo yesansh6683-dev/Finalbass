@@ -20,8 +20,8 @@ const myHtml = `
 <body>
     <div class="text-center">
         <h1 class="text-4xl font-bold text-green-500 mb-4">DarkBase is LIVE! 🚀</h1>
-        <p class="text-gray-400">Database connected successfully.</p>
-        <p class="mt-4 text-sm text-gray-600">Now you can replace this HTML with your full dashboard code.</p>
+        <p class="text-gray-400">Connected to PocketBase v0.24</p>
+        <p class="mt-4 text-sm text-gray-600">Now go to GitHub and replace this HTML with your real Dashboard code.</p>
         <a href="/_/" class="mt-6 inline-block bg-green-600 px-6 py-2 rounded text-white hover:bg-green-700">Go to Admin Panel</a>
     </div>
 </body>
@@ -50,9 +50,10 @@ func main() {
             }
         }
 
-        // 2. Direct HTML Serving (No folder needed)
-        e.Router.GET("/*", func(re *core.RequestEvent) error {
-            return re.HTML(http.StatusOK, myHtml)
+        // 2. Direct HTML Serving ( FIXED: "/*" -> "/" )
+        // "/" ka matlab hai Root URL (Homepage)
+        e.Router.GET("/", func(e *core.RequestEvent) error {
+            return e.HTML(http.StatusOK, myHtml)
         })
         
         return e.Next()
