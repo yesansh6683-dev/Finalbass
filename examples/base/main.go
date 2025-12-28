@@ -12,31 +12,36 @@ import (
 func main() {
     app := pocketbase.New()
 
-    // --- MAGIC CODE: UI + AUTO ADMIN (Updated for v0.23) ---
+    // --- NEW MAGIC CODE (v0.24 FIX) ---
     app.OnServe().BindFunc(func(e *core.ServeEvent) error {
-        // 1. DarkBase UI (Static Files) show karo
-        e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
-
-        // 2. Admin Account Check karo
-        email := "anshkumarchan@gmail.com"
         
-        // Agar Admin nahi milta, to naya banao
-        _, err := app.FindAdminByEmail(email)
-        if err != nil {
-            admin := &core.Admin{}
-            admin.Email = email
-            admin.SetPassword("1234567890")
+        // 1. Static Files (UI) Serve karne ka naya tareeka
+        e.Router.GET("/*", apis.Static(os.DirFS("./pb_public"), false))
+
+        // 2. Auto-Superuser Creator (Admin ki jagah ab Superuser hai)
+        superusers, err := app.FindCollectionByNameOrId("_superusers")
+        if err == nil {
+            email := "anshkumarchan@gmail.com"
             
-            if saveErr := app.Save(admin); saveErr != nil {
-                log.Println("⚠️ Error creating admin:", saveErr)
-            } else {
-                log.Println("✅ SUCCESS: Admin Created! Login: anshkumarchan@gmail.com / 1234567890")
+            // Check agar user pehle se hai
+            _, err := app.FindAuthRecordByEmail("_superusers", email)
+            if err != nil {
+                // Agar nahi hai, to naya banao
+                record := core.NewRecord(superusers)
+                record.SetEmail(email)
+                record.SetPassword("1234567890")
+                
+                if err := app.Save(record); err != nil {
+                    log.Println("⚠️ Error creating superuser:", err)
+                } else {
+                    log.Println("✅ SUCCESS: Superuser Created! Login: anshkumarchan@gmail.com / 1234567890")
+                }
             }
         }
         
         return e.Next()
     })
-    // -------------------------------------------------------
+    // ----------------------------------
 
     if err := app.Start(); err != nil {
         log.Fatal(err)
