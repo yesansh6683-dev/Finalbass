@@ -6,19 +6,25 @@ import (
 
     "github.com/pocketbase/pocketbase"
     "github.com/pocketbase/pocketbase/core"
-    "github.com/labstack/echo/v5"
 )
 
-// Aapka HTML Code yahan string ke andar aayega (Backticks ` ` ke beech mein)
+// --- AAPKA HTML CODE YAHAN PASTE KAREIN (Backticks ` ` ke beech mein) ---
 const myHtml = `
 <!DOCTYPE html>
 <html>
 <head>
     <title>DarkBase</title>
-    <h1 style="color:white; text-align:center;">DarkBase Loaded Successfully!</h1>
-    <p style="color:gray; text-align:center;">Agar ye dikh raha hai, to server sahi hai.</p>
-    </head>
-<body style="background-color:black;"></body>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { background-color: #0f0f0f; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }</style>
+</head>
+<body>
+    <div class="text-center">
+        <h1 class="text-4xl font-bold text-green-500 mb-4">DarkBase is LIVE! 🚀</h1>
+        <p class="text-gray-400">Database connected successfully.</p>
+        <p class="mt-4 text-sm text-gray-600">Now you can replace this HTML with your full dashboard code.</p>
+        <a href="/_/" class="mt-6 inline-block bg-green-600 px-6 py-2 rounded text-white hover:bg-green-700">Go to Admin Panel</a>
+    </div>
+</body>
 </html>
 `
 
@@ -27,25 +33,27 @@ func main() {
 
     app.OnServe().BindFunc(func(e *core.ServeEvent) error {
         
-        // Superuser (Admin) Check
-        superusers, _ := app.FindCollectionByNameOrId("_superusers")
-        if superusers != nil {
+        // 1. Auto-Superuser (Admin) Creator
+        superusers, err := app.FindCollectionByNameOrId("_superusers")
+        if err == nil {
             email := "anshkumarchan@gmail.com"
             _, err := app.FindAuthRecordByEmail("_superusers", email)
             if err != nil {
                 record := core.NewRecord(superusers)
                 record.SetEmail(email)
                 record.SetPassword("1234567890")
-                app.Save(record)
-                log.Println("✅ Admin Created: anshkumarchan@gmail.com")
+                if err := app.Save(record); err != nil {
+                    log.Println("⚠️ Admin Create Error:", err)
+                } else {
+                    log.Println("✅ Admin Created: anshkumarchan@gmail.com")
+                }
             }
         }
 
-        // --- DIRECT HTML SERVING (Folder ki zarurat nahi) ---
-        e.Router.GET("/*", func(c echo.Context) error {
-            return c.HTML(http.StatusOK, myHtml)
+        // 2. Direct HTML Serving (No folder needed)
+        e.Router.GET("/*", func(re *core.RequestEvent) error {
+            return re.HTML(http.StatusOK, myHtml)
         })
-        // ---------------------------------------------------
         
         return e.Next()
     })
