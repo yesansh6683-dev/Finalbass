@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DarkBase - Admin Dashboard</title>
+    
+    <!-- 1. TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. PocketBase SDK via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.21.3/pocketbase.umd.min.js"></script>
+    
+    <!-- 3. Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 4. Tailwind Configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                100: '#85f5c1', 200: '#69e6b0', 300: '#53d49f',
+                400: '#3ecf8e', // DarkBase Green
+                500: '#34b27b', 600: '#2a9568', 700: '#217a55',
+                800: '#196043', 900: '#124732',
+              },
+              sidebar: { bg: '#181818', hover: '#232323', border: '#2a2a2a' },
+              panel: { bg: '#1c1c1c', border: '#2e2e2e' }
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              mono: ['Fira Code', 'monospace'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { background-color: #121212; color: #ededed; }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: #181818; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #444; }
+      .fade-in { animation: fadeIn 0.3s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- LOGIN OVERLAY (Shown if not authenticated) -->
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-[#121212] flex items-center justify-center hidden">
+        <div class="w-full max-w-md bg-[#1c1c1c] border border-[#2e2e2e] rounded-lg p-8 shadow-2xl">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-12 h-12 rounded bg-[#232323] border border-gray-700 flex items-center justify-center text-brand-400 font-bold text-2xl mb-4">D</div>
+                <h2 class="text-xl text-white font-medium">Admin Login</h2>
+                <p class="text-sm text-gray-500">Access the <span class="font-mono text-xs bg-gray-800 px-1 rounded">_superusers</span> collection</p>
+            </div>
+            
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                    <input type="email" id="email" class="w-full bg-[#121212] border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-400 outline-none transition-colors" placeholder="admin@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Password</label>
+                    <input type="password" id="password" class="w-full bg-[#121212] border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-400 outline-none transition-colors" placeholder="••••••••••" required>
+                </div>
+                <div id="login-error" class="text-red-400 text-xs hidden"></div>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-2 rounded transition-colors shadow-lg shadow-brand-500/20">
+                    Sign In
+                </button>
+            </form>
+            <p class="mt-4 text-center text-xs text-gray-600">Connecting to: https://finalbass.onrender.com</p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="app" class="flex h-screen w-screen bg-[#121212] text-gray-200 font-sans hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-16 h-screen bg-sidebar-bg border-r border-sidebar-border flex flex-col justify-between shrink-0 z-50">
+            <div class="flex flex-col items-center py-4 space-y-4">
+                <!-- Logo -->
+                <div class="w-10 h-10 bg-[#1c1c1c] rounded border border-gray-700 flex items-center justify-center text-brand-400 font-bold text-xl cursor-pointer">D</div>
+                <div class="h-px w-8 bg-gray-800 my-2"></div>
+                <!-- Nav Items -->
+                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-brand-400 bg-brand-400/10 transition-colors">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                </button>
+                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </button>
+                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="pb-4 flex flex-col items-center">
+                <button id="logout-btn" class="w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-[#2a2a2a] transition-colors" title="Logout">
+                   <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <div class="flex-1 flex flex-col min-w-0">
+            
+            <!-- HEADER -->
+            <header class="h-14 bg-panel-bg border-b border-panel-border flex items-center justify-between px-6 sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-sm font-medium text-gray-200">
+                        <span class="text-gray-500">System / </span> Superusers
+                    </h1>
+                    <div class="h-5 w-px bg-gray-700 mx-2"></div>
+                    <div class="hidden md:flex items-center gap-2 px-2 py-1 border rounded-full transition-colors duration-300 bg-green-500/10 border-green-500/20 text-green-500">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-xs font-medium">Connected</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span id="admin-email" class="text-xs font-mono text-gray-400"></span>
+                        <div class="w-8 h-8 rounded-full bg-brand-800 border border-brand-600 flex items-center justify-center text-xs font-bold text-brand-100">AD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <main class="flex-1 overflow-auto bg-[#121212] p-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-normal text-white mb-2">Superusers</h1>
+                            <p class="text-gray-400 text-sm">Managing system administrators from <span class="font-mono text-brand-400">_superusers</span> collection</p>
+                        </div>
+                        <button onclick="fetchSuperusers()" class="flex items-center gap-2 bg-[#232323] hover:bg-[#2a2a2a] text-white px-4 py-2 rounded border border-gray-700 font-medium text-sm transition-colors">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Data Grid -->
+                    <div class="bg-panel-bg border border-panel-border rounded-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-[#151515] text-gray-400 border-b border-panel-border font-medium">
+                                    <tr>
+                                        <th class="px-6 py-3 font-normal">ID</th>
+                                        <th class="px-6 py-3 font-normal">Email</th>
+                                        <th class="px-6 py-3 font-normal">Created</th>
+                                        <th class="px-6 py-3 font-normal">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body" class="divide-y divide-panel-border text-gray-300">
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 animate-pulse">
+                                            Loading data...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Initialize PocketBase
+        const BACKEND_URL = 'https://finalbass.onrender.com';
+        const pb = new PocketBase(BACKEND_URL);
+
+        // DOM Elements
+        const loginScreen = document.getElementById('login-screen');
+        const appScreen = document.getElementById('app');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const tableBody = document.getElementById('data-table-body');
+        const adminEmailDisplay = document.getElementById('admin-email');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // 2. Auth State Management
+        function checkAuth() {
+            if (pb.authStore.isValid && pb.authStore.isAdmin) {
+                // Logged in as Admin
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                adminEmailDisplay.textContent = pb.authStore.model.email;
+                fetchSuperusers();
+            } else {
+                // Not logged in
+                appScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+            }
+        }
+
+        // 3. Login Handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+
+            try {
+                btn.innerHTML = 'Signing in...';
+                loginError.classList.add('hidden');
+                
+                await pb.admins.authWithPassword(email, password);
+                
+                checkAuth();
+            } catch (err) {
+                console.error(err);
+                loginError.textContent = "Invalid admin credentials or connection error.";
+                loginError.classList.remove('hidden');
+            } finally {
+                btn.innerHTML = 'Sign In';
+            }
+        });
+
+        // 4. Logout Handler
+        logoutBtn.addEventListener('click', () => {
+            pb.authStore.clear();
+            checkAuth();
+        });
+
+        // 5. Data Fetching (_superusers)
+        async function fetchSuperusers() {
+            try {
+                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 animate-pulse">Fetching superusers...</td></tr>`;
+                
+                const records = await pb.collection('_superusers').getList(1, 50, {
+                    sort: '-created',
+                });
+
+                renderTable(records.items);
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                // If token invalid, logout
+                if (err.status === 401) {
+                    pb.authStore.clear();
+                    checkAuth();
+                    return;
+                }
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-red-400">
+                            Error fetching data: ${err.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 6. Render Table
+        function renderTable(items) {
+            if (items.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No superusers found.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = items.map(user => `
+                <tr class="hover:bg-[#1a1a1a] transition-colors fade-in">
+                    <td class="px-6 py-4 font-mono text-xs text-brand-400">${user.id}</td>
+                    <td class="px-6 py-4 font-medium text-white">${user.email}</td>
+                    <td class="px-6 py-4 text-gray-500 text-xs">${new Date(user.created).toLocaleString()}</td>
+                    <td class="px-6 py-4 text-gray-500 text-xs">${new Date(user.updated).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            checkAuth();
+        });
+
+    </script>
+</body>
+</html>
