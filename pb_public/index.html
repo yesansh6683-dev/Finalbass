@@ -1,285 +1,1585 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DarkBase - Admin Dashboard</title>
-    
-    <!-- 1. TailwindCSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 2. PocketBase SDK via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.21.3/pocketbase.umd.min.js"></script>
-    
-    <!-- 3. Lucide Icons via CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- 4. Tailwind Configuration -->
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                100: '#85f5c1', 200: '#69e6b0', 300: '#53d49f',
-                400: '#3ecf8e', // DarkBase Green
-                500: '#34b27b', 600: '#2a9568', 700: '#217a55',
-                800: '#196043', 900: '#124732',
-              },
-              sidebar: { bg: '#181818', hover: '#232323', border: '#2a2a2a' },
-              panel: { bg: '#1c1c1c', border: '#2e2e2e' }
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-              mono: ['Fira Code', 'monospace'],
-            }
-          }
-        }
-      }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Dashboard Clone</title>
     <style>
-      body { background-color: #121212; color: #ededed; }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-track { background: #181818; }
-      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #444; }
-      .fade-in { animation: fadeIn 0.3s ease-in-out; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7C3AED;
+            --accent: #60A5FA;
+            --destructive: #EF4444;
+            --background: #0f172a;
+            --foreground: #f1f5f9;
+            --card: #1e293b;
+            --border: #334155;
+            --sidebar: #0f172a;
+            --sidebar-foreground: #cbd5e1;
+            --sidebar-border: #1e293b;
+            --sidebar-primary: #7C3AED;
+            --sidebar-primary-foreground: #f1f5f9;
+            --sidebar-accent: #1e293b;
+        }
+
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            color: var(--foreground);
+            background: var(--background);
+        }
+
+        body {
+            background: var(--background);
+            color: var(--foreground);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-start {
+            align-items: flex-start;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .min-h-screen {
+            min-height: 100vh;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-foreground {
+            color: var(--foreground);
+        }
+
+        .text-foreground\/50 {
+            color: rgba(241, 245, 249, 0.5);
+        }
+
+        .text-foreground\/70 {
+            color: rgba(241, 245, 249, 0.7);
+        }
+
+        .bg-background {
+            background-color: var(--background);
+        }
+
+        .bg-card {
+            background-color: var(--card);
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .bg-primary\/20 {
+            background-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .bg-destructive\/10 {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .text-primary-foreground {
+            color: var(--sidebar-primary-foreground);
+        }
+
+        .text-destructive {
+            color: var(--destructive);
+        }
+
+        .text-red-400 {
+            color: #f87171;
+        }
+
+        .text-green-400 {
+            color: #4ade80;
+        }
+
+        .text-green-500 {
+            color: #22c55e;
+        }
+
+        .text-yellow-400 {
+            color: #facc15;
+        }
+
+        .text-yellow-500 {
+            color: #eab308;
+        }
+
+        .bg-red-400 {
+            background-color: #f87171;
+        }
+
+        .bg-red-500\/20 {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .bg-green-500 {
+            background-color: #22c55e;
+        }
+
+        .bg-green-500\/20 {
+            background-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .bg-yellow-500\/20 {
+            background-color: rgba(234, 179, 8, 0.2);
+        }
+
+        .bg-blue-500 {
+            background-color: #3b82f6;
+        }
+
+        .bg-purple-500 {
+            background-color: #a855f7;
+        }
+
+        .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--accent), var(--primary));
+        }
+
+        .border {
+            border: 1px solid var(--border);
+        }
+
+        .border-b {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .border-r {
+            border-right: 1px solid var(--sidebar-border);
+        }
+
+        .border-primary {
+            border-color: var(--primary);
+        }
+
+        .border-destructive\/20 {
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .overflow-auto {
+            overflow: auto;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .max-h-96 {
+            max-height: 24rem;
+        }
+
+        .max-w-md {
+            max-width: 28rem;
+        }
+
+        .max-w-4xl {
+            max-width: 56rem;
+        }
+
+        .max-w-7xl {
+            max-width: 80rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .w-64 {
+            width: 16rem;
+        }
+
+        .w-20 {
+            width: 5rem;
+        }
+
+        .w-2 {
+            width: 0.5rem;
+        }
+
+        .w-3 {
+            width: 0.75rem;
+        }
+
+        .w-8 {
+            width: 2rem;
+        }
+
+        .h-screen {
+            height: 100vh;
+        }
+
+        .h-2 {
+            height: 0.5rem;
+        }
+
+        .h-3 {
+            height: 0.75rem;
+        }
+
+        .h-8 {
+            height: 2rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .lg\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .lg\:grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .lg\:grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .lg\:col-span-2 {
+            grid-column: span 2 / span 2;
+        }
+
+        .lg\:col-span-3 {
+            grid-column: span 3 / span 3;
+        }
+
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        .space-y-8 > * + * {
+            margin-top: 2rem;
+        }
+
+        .sticky {
+            position: sticky;
+        }
+
+        .top-0 {
+            top: 0;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .transition-colors {
+            transition: background-color, color 0.2s ease;
+        }
+
+        .duration-300 {
+            transition-duration: 0.3s;
+        }
+
+        .hover\:bg-foreground\/10:hover {
+            background-color: rgba(241, 245, 249, 0.1);
+        }
+
+        .hover\:bg-foreground\/20:hover {
+            background-color: rgba(241, 245, 249, 0.2);
+        }
+
+        .hover\:bg-foreground\/5:hover {
+            background-color: rgba(241, 245, 249, 0.05);
+        }
+
+        .hover\:bg-red-500\/10:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .hover\:bg-destructive\/10:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .hover\:bg-primary\/90:hover {
+            background-color: rgba(124, 58, 237, 0.9);
+        }
+
+        .hover\:text-foreground:hover {
+            color: var(--foreground);
+        }
+
+        .hover\:border-primary\/50:hover {
+            border-color: rgba(124, 58, 237, 0.5);
+        }
+
+        .disabled\:opacity-50:disabled {
+            opacity: 0.5;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            background: none;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+            color: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Sidebar */
+        aside {
+            background: var(--sidebar);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-logo-box {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.25rem;
+            background: linear-gradient(to bottom right, var(--sidebar-primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem;
+            space-y: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+            color: var(--sidebar-foreground);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .sidebar-nav button:hover {
+            background-color: var(--sidebar-accent);
+        }
+
+        .sidebar-nav button.active {
+            background-color: var(--sidebar-primary);
+            color: var(--sidebar-primary-foreground);
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--sidebar-border);
+            font-size: 0.75rem;
+            color: var(--sidebar-foreground);
+        }
+
+        .sidebar-footer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 9999px;
+            background-color: #22c55e;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        main {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 80rem;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .icon-large {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 28rem;
+            width: 90%;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            z-index: 50;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        @media (max-width: 1024px) {
+            aside {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .flex-lg-row {
+                flex-direction: column;
+            }
+
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .lg\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .lg\:grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .lg\:grid-cols-4 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .lg\:col-span-2 {
+                grid-column: auto;
+            }
+
+            .lg\:col-span-3 {
+                grid-column: auto;
+            }
+        }
     </style>
 </head>
-<body class="overflow-hidden">
 
-    <!-- LOGIN OVERLAY (Shown if not authenticated) -->
-    <div id="login-screen" class="fixed inset-0 z-[100] bg-[#121212] flex items-center justify-center hidden">
-        <div class="w-full max-w-md bg-[#1c1c1c] border border-[#2e2e2e] rounded-lg p-8 shadow-2xl">
-            <div class="flex flex-col items-center mb-6">
-                <div class="w-12 h-12 rounded bg-[#232323] border border-gray-700 flex items-center justify-center text-brand-400 font-bold text-2xl mb-4">D</div>
-                <h2 class="text-xl text-white font-medium">Admin Login</h2>
-                <p class="text-sm text-gray-500">Access the <span class="font-mono text-xs bg-gray-800 px-1 rounded">_superusers</span> collection</p>
-            </div>
-            
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
-                    <input type="email" id="email" class="w-full bg-[#121212] border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-400 outline-none transition-colors" placeholder="admin@example.com" required>
+<body>
+    <div class="flex min-h-screen bg-background">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col h-screen sticky top-0">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div id="sidebarLogo" class="sidebar-logo">
+                    <div class="sidebar-logo-box">SB</div>
+                    <span class="font-bold text-sm text-sidebar-foreground">Supabase</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Password</label>
-                    <input type="password" id="password" class="w-full bg-[#121212] border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-400 outline-none transition-colors" placeholder="••••••••••" required>
-                </div>
-                <div id="login-error" class="text-red-400 text-xs hidden"></div>
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-2 rounded transition-colors shadow-lg shadow-brand-500/20">
-                    Sign In
-                </button>
-            </form>
-            <p class="mt-4 text-center text-xs text-gray-600">Connecting to: https://finalbass.onrender.com</p>
-        </div>
-    </div>
-
-    <!-- MAIN DASHBOARD -->
-    <div id="app" class="flex h-screen w-screen bg-[#121212] text-gray-200 font-sans hidden">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-16 h-screen bg-sidebar-bg border-r border-sidebar-border flex flex-col justify-between shrink-0 z-50">
-            <div class="flex flex-col items-center py-4 space-y-4">
-                <!-- Logo -->
-                <div class="w-10 h-10 bg-[#1c1c1c] rounded border border-gray-700 flex items-center justify-center text-brand-400 font-bold text-xl cursor-pointer">D</div>
-                <div class="h-px w-8 bg-gray-800 my-2"></div>
-                <!-- Nav Items -->
-                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-brand-400 bg-brand-400/10 transition-colors">
-                    <i data-lucide="shield" class="w-5 h-5"></i>
-                </button>
-                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
-                    <i data-lucide="users" class="w-5 h-5"></i>
-                </button>
-                <button class="nav-item w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
-                    <i data-lucide="database" class="w-5 h-5"></i>
+                <button id="sidebarToggle" class="p-1 hover:bg-sidebar-accent rounded transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
-            
-            <div class="pb-4 flex flex-col items-center">
-                <button id="logout-btn" class="w-10 h-10 rounded-md flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-[#2a2a2a] transition-colors" title="Logout">
-                   <i data-lucide="log-out" class="w-5 h-5"></i>
+
+            <!-- Project Info -->
+            <div id="projectInfo" class="p-4 border-b border-sidebar-border">
+                <div class="text-xs text-sidebar-foreground/70">Current Project</div>
+                <div class="font-semibold text-sidebar-foreground mt-1 text-sm">My App</div>
+                <div class="text-xs text-sidebar-foreground/50 mt-1">Free Plan</div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-2 sidebar-nav" id="sidebarNav">
+                <button data-section="dashboard" class="active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Dashboard</span>
                 </button>
+                <button data-section="database">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                        <path d="M3 12a9 3 0 0 0 18 0"></path>
+                    </svg>
+                    <span>Database</span>
+                </button>
+                <button data-section="auth">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Authentication</span>
+                </button>
+                <button data-section="storage">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 11h.01M8 11h.01M12 11h.01M16 15h.01M8 15h.01M12 15h.01"></path>
+                    </svg>
+                    <span>Storage</span>
+                </button>
+                <button data-section="realtime">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                    <span>Real-time</span>
+                </button>
+                <button data-section="settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.96 2.96l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m2.96-2.96l4.24-4.24M19.78 19.78l-4.24-4.24m-2.96-2.96l-4.24-4.24"></path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <!-- Footer -->
+            <div id="sidebarFooter" class="sidebar-footer space-y-2">
+                <div class="text-xs text-sidebar-foreground/70">Status</div>
+                <div class="sidebar-footer-item">
+                    <div class="status-dot"></div>
+                    <span class="text-sm text-sidebar-foreground">Online</span>
+                </div>
             </div>
         </aside>
 
-        <!-- CONTENT AREA -->
-        <div class="flex-1 flex flex-col min-w-0">
-            
-            <!-- HEADER -->
-            <header class="h-14 bg-panel-bg border-b border-panel-border flex items-center justify-between px-6 sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <h1 class="text-sm font-medium text-gray-200">
-                        <span class="text-gray-500">System / </span> Superusers
-                    </h1>
-                    <div class="h-5 w-px bg-gray-700 mx-2"></div>
-                    <div class="hidden md:flex items-center gap-2 px-2 py-1 border rounded-full transition-colors duration-300 bg-green-500/10 border-green-500/20 text-green-500">
-                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span class="text-xs font-medium">Connected</span>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <span id="admin-email" class="text-xs font-mono text-gray-400"></span>
-                        <div class="w-8 h-8 rounded-full bg-brand-800 border border-brand-600 flex items-center justify-center text-xs font-bold text-brand-100">AD</div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- PAGE CONTENT -->
-            <main class="flex-1 overflow-auto bg-[#121212] p-8">
-                <div class="max-w-6xl mx-auto">
-                    <div class="flex justify-between items-center mb-8">
-                        <div>
-                            <h1 class="text-3xl font-normal text-white mb-2">Superusers</h1>
-                            <p class="text-gray-400 text-sm">Managing system administrators from <span class="font-mono text-brand-400">_superusers</span> collection</p>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <div class="min-h-screen" id="mainContent">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="container">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+                        <div class="flex items-center gap-3">
+                            <div id="connectionStatus" class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                            <span class="text-sm text-foreground/70">Connected</span>
                         </div>
-                        <button onclick="fetchSuperusers()" class="flex items-center gap-2 bg-[#232323] hover:bg-[#2a2a2a] text-white px-4 py-2 rounded border border-gray-700 font-medium text-sm transition-colors">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div id="statsGrid" class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-gradient-to-br from-primary to-accent p-3 rounded-lg">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground mb-1" data-stat="users">0</div>
+                            <div class="text-sm text-foreground/70">Active Users</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-lg">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <path d="M12 1v6m0 6v6"></path>
+                                        <path d="M4.22 4.22l4.24 4.24m2.96 2.96l4.24 4.24"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground mb-1" data-stat="requests">0</div>
+                            <div class="text-sm text-foreground/70">Requests</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-3 rounded-lg">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                        <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground mb-1" data-stat="dbsize">0 GB</div>
+                            <div class="text-sm text-foreground/70">Database Size</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-gradient-to-br from-orange-500 to-red-500 p-3 rounded-lg">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                        <circle cx="12" cy="13" r="4"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground mb-1" data-stat="storage">0 GB</div>
+                            <div class="text-sm text-foreground/70">Storage</div>
+                        </div>
+                    </div>
+
+                    <!-- No Data Message -->
+                    <div class="bg-card border border-border rounded-lg p-12 flex flex-col items-center justify-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/30 mb-4">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">No Data Available</h3>
+                        <p class="text-sm text-foreground/50 text-center max-w-md">
+                            Connect your database and enable real-time monitoring to see data here. All values will update automatically once data starts flowing.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Database Section -->
+                <section id="database-section" class="container hidden">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-4">Database</h1>
+                        <div class="flex gap-4 border-b border-border mb-6">
+                            <button class="tab-button px-4 py-2 text-sm font-medium active text-primary border-b-2 border-primary" data-tab="tables">Tables</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="sql">SQL Editor</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="backups">Backups</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-card border border-border rounded-lg p-12 flex flex-col items-center justify-center">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/30 mb-4">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">No Tables Yet</h3>
+                        <p class="text-sm text-foreground/50 text-center max-w-md mb-6">
+                            Connect your database and create tables to see them here.
+                        </p>
+                        <button class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Create Table
                         </button>
                     </div>
+                </section>
 
-                    <!-- Data Grid -->
-                    <div class="bg-panel-bg border border-panel-border rounded-lg overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-[#151515] text-gray-400 border-b border-panel-border font-medium">
-                                    <tr>
-                                        <th class="px-6 py-3 font-normal">ID</th>
-                                        <th class="px-6 py-3 font-normal">Email</th>
-                                        <th class="px-6 py-3 font-normal">Created</th>
-                                        <th class="px-6 py-3 font-normal">Updated</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="data-table-body" class="divide-y divide-panel-border text-gray-300">
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 animate-pulse">
-                                            Loading data...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Auth Section -->
+                <section id="auth-section" class="container hidden">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-4">Authentication</h1>
+                        <div class="flex gap-4 border-b border-border mb-6">
+                            <button class="tab-button px-4 py-2 text-sm font-medium active text-primary border-b-2 border-primary" data-tab="users">Users</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="providers">Providers</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="policies">Policies</button>
                         </div>
                     </div>
-                </div>
-            </main>
-        </div>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-3">
+                            <div class="flex-1 relative">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50" style="margin-top: -9px;">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                <input type="text" id="authSearchInput" placeholder="Search users..." class="w-full bg-card border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary" />
+                            </div>
+                            <button id="addAuthUserBtn" class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add User
+                            </button>
+                        </div>
+
+                        <div id="newUserForm" class="hidden bg-card border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-4">Create New User</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Email</label>
+                                    <input type="email" id="newUserEmail" placeholder="user@example.com" class="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Password</label>
+                                    <div class="relative">
+                                        <input type="password" id="newUserPassword" placeholder="••••••••" class="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary" />
+                                        <button type="button" id="togglePasswordBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button id="createUserBtn" class="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                                        Create User
+                                    </button>
+                                    <button id="cancelUserBtn" class="flex-1 bg-foreground/10 text-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-foreground/20 transition-colors">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-border bg-foreground/5">
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Email</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Status</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Created</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="authUsersTable">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Storage Section -->
+                <section id="storage-section" class="container hidden">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-4">Storage</h1>
+                        <div class="flex items-center gap-2 text-sm text-foreground/70 mb-6">
+                            <span>Root</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-3">
+                            <div class="flex-1 relative">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50" style="margin-top: -9px;">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                <input type="text" id="storageSearchInput" placeholder="Search files..." class="w-full bg-card border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary" />
+                            </div>
+                            <label class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors cursor-pointer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                Upload Files
+                                <input type="file" id="storageFileInput" class="hidden" />
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-card border border-border rounded-lg p-4">
+                                <div class="text-sm text-foreground/70 mb-1">Used Storage</div>
+                                <div class="text-2xl font-bold text-foreground" data-stat="storage-used">0 GB</div>
+                                <div class="text-xs text-foreground/50 mt-1">of 100 GB</div>
+                            </div>
+                            <div class="bg-card border border-border rounded-lg p-4">
+                                <div class="text-sm text-foreground/70 mb-1">Files Count</div>
+                                <div class="text-2xl font-bold text-foreground" data-stat="file-count">0</div>
+                                <div class="text-xs text-foreground/50 mt-1">total files</div>
+                            </div>
+                            <div class="bg-card border border-border rounded-lg p-4">
+                                <div class="text-sm text-foreground/70 mb-1">Buckets</div>
+                                <div class="text-2xl font-bold text-foreground" data-stat="buckets">0</div>
+                                <div class="text-xs text-foreground/50 mt-1">active buckets</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-border bg-foreground/5">
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Name</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Size</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Modified</th>
+                                            <th class="px-6 py-4 text-left text-sm font-semibold text-foreground">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="storageFilesTable">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Real-time Section -->
+                <section id="realtime-section" class="container hidden">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-4">Real-time</h1>
+                        <div class="flex gap-4 border-b border-border mb-6">
+                            <button class="tab-button px-4 py-2 text-sm font-medium active text-primary border-b-2 border-primary" data-tab="monitor">Monitor</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="channels">Channels</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="statistics">Statistics</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-card border border-border rounded-lg p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="bg-gradient-to-br from-primary to-accent p-3 rounded-lg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground" data-stat="active-connections">0</div>
+                            <div class="text-xs text-foreground/70 mt-1">Active Connections</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-lg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <path d="M12 1v6m0 6v6"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground" data-stat="events-per-min">0</div>
+                            <div class="text-xs text-foreground/70 mt-1">Events/min</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-3 rounded-lg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <path d="M12 1v6m0 6v6"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground" data-stat="avg-latency">0ms</div>
+                            <div class="text-xs text-foreground/70 mt-1">Avg Latency</div>
+                        </div>
+
+                        <div class="bg-card border border-border rounded-lg p-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="bg-gradient-to-br from-green-500 to-emerald-500 p-3 rounded-lg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-foreground" data-stat="rt-status">Online</div>
+                            <div class="text-xs text-foreground/70 mt-1">Status</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card border border-border rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-foreground mb-4">Send Broadcast</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Channel</label>
+                                <select id="broadcastChannel" class="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary">
+                                    <option>public:users</option>
+                                    <option>public:products</option>
+                                    <option>broadcast</option>
+                                    <option>presence</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Message</label>
+                                <textarea id="broadcastMessage" placeholder="Enter message..." class="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary" rows="3"></textarea>
+                            </div>
+                            <button id="sendBroadcastBtn" class="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                Send Message
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings-section" class="container hidden">
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground mb-4">Settings</h1>
+                        <div class="flex gap-4 border-b border-border mb-6">
+                            <button class="tab-button px-4 py-2 text-sm font-medium active text-primary border-b-2 border-primary" data-tab="general">General</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="api">API Keys</button>
+                            <button class="tab-button px-4 py-2 text-sm font-medium text-foreground/50 hover:text-foreground" data-tab="billing">Billing</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-8 max-w-4xl">
+                        <div class="bg-card border border-border rounded-lg p-6">
+                            <h2 class="text-xl font-bold text-foreground mb-6">Project Settings</h2>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Project Name</label>
+                                    <input type="text" id="projectNameInput" value="My App" class="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-foreground mb-2">Project ID</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" value="proj_1a2b3c4d5e6f7g8h" readonly class="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground/70" />
+                                        <button class="copy-btn p-2 hover:bg-foreground/10 rounded-lg transition-colors" data-value="proj_1a2b3c4d5e6f7g8h" data-label="Project ID">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/50">
+                                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button id="saveSettingsBtn" class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors w-fit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
+                            <h2 class="text-xl font-bold text-foreground mb-6">Danger Zone</h2>
+                            <button id="deleteProjectBtn" class="w-full flex items-center justify-between px-4 py-3 bg-destructive/5 border border-destructive/20 rounded-lg text-destructive hover:bg-destructive/10 disabled:opacity-50 transition-colors">
+                                <div class="text-left">
+                                    <div class="font-medium">Delete Project</div>
+                                    <div class="text-xs opacity-70">This action cannot be undone</div>
+                                </div>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
     <script>
-        // 1. Initialize PocketBase
-        const BACKEND_URL = 'https://finalbass.onrender.com';
-        const pb = new PocketBase(BACKEND_URL);
-
-        // DOM Elements
-        const loginScreen = document.getElementById('login-screen');
-        const appScreen = document.getElementById('app');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const tableBody = document.getElementById('data-table-body');
-        const adminEmailDisplay = document.getElementById('admin-email');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // 2. Auth State Management
-        function checkAuth() {
-            if (pb.authStore.isValid && pb.authStore.isAdmin) {
-                // Logged in as Admin
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                adminEmailDisplay.textContent = pb.authStore.model.email;
-                fetchSuperusers();
-            } else {
-                // Not logged in
-                appScreen.classList.add('hidden');
-                loginScreen.classList.remove('hidden');
+        // State
+        const app = {
+            activeSection: 'dashboard',
+            sidebarExpanded: true,
+            users: [],
+            files: [],
+            events: [],
+            stats: {
+                users: 0,
+                requests: 0,
+                dbsize: '0 GB',
+                storage: '0 GB',
+                'storage-used': '0 GB',
+                'file-count': 0,
+                'buckets': 0,
+                'active-connections': 0,
+                'events-per-min': 0,
+                'avg-latency': 0,
+                'rt-status': 'Offline'
             }
+        };
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<div class="text-sm font-medium">${message}</div>`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        // 3. Login Handler
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = e.target.querySelector('button');
-
-            try {
-                btn.innerHTML = 'Signing in...';
-                loginError.classList.add('hidden');
-                
-                await pb.admins.authWithPassword(email, password);
-                
-                checkAuth();
-            } catch (err) {
-                console.error(err);
-                loginError.textContent = "Invalid admin credentials or connection error.";
-                loginError.classList.remove('hidden');
-            } finally {
-                btn.innerHTML = 'Sign In';
-            }
+        // Section Navigation
+        document.querySelectorAll('[data-section]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.getAttribute('data-section');
+                navigateToSection(section);
+            });
         });
 
-        // 4. Logout Handler
-        logoutBtn.addEventListener('click', () => {
-            pb.authStore.clear();
-            checkAuth();
-        });
+        function navigateToSection(section) {
+            app.activeSection = section;
 
-        // 5. Data Fetching (_superusers)
-        async function fetchSuperusers() {
-            try {
-                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 animate-pulse">Fetching superusers...</td></tr>`;
-                
-                const records = await pb.collection('_superusers').getList(1, 50, {
-                    sort: '-created',
-                });
+            // Hide all sections
+            document.querySelectorAll('[id$="-section"]').forEach(s => s.classList.add('hidden'));
 
-                renderTable(records.items);
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                // If token invalid, logout
-                if (err.status === 401) {
-                    pb.authStore.clear();
-                    checkAuth();
-                    return;
+            // Show selected section
+            document.getElementById(`${section}-section`).classList.remove('hidden');
+
+            // Update sidebar
+            document.querySelectorAll('[data-section]').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+            // Reset tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-primary', 'border-b-2', 'border-primary');
+                btn.classList.add('text-foreground/50', 'hover:text-foreground');
+            });
+            document.querySelectorAll('.tab-button[data-tab]').forEach(btn => {
+                if (btn.getAttribute('data-tab') === 'users' || btn.getAttribute('data-tab') === 'tables' || btn.getAttribute('data-tab') === 'monitor' || btn.getAttribute('data-tab') === 'general') {
+                    btn.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
+                    btn.classList.remove('text-foreground/50', 'hover:text-foreground');
                 }
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-6 py-8 text-center text-red-400">
-                            Error fetching data: ${err.message}
-                        </td>
-                    </tr>
-                `;
-            }
+            });
         }
 
-        // 6. Render Table
-        function renderTable(items) {
-            if (items.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No superusers found.</td></tr>`;
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            const aside = document.getElementById('sidebar');
+            app.sidebarExpanded = !app.sidebarExpanded;
+            if (app.sidebarExpanded) {
+                aside.classList.remove('w-20');
+                aside.classList.add('w-64');
+                document.getElementById('sidebarLogo').style.display = 'flex';
+                document.getElementById('projectInfo').style.display = 'block';
+                document.getElementById('sidebarFooter').style.display = 'block';
+                document.querySelectorAll('[data-section] span').forEach(s => s.style.display = 'inline');
+            } else {
+                aside.classList.remove('w-64');
+                aside.classList.add('w-20');
+                document.getElementById('sidebarLogo').style.display = 'none';
+                document.getElementById('projectInfo').style.display = 'none';
+                document.getElementById('sidebarFooter').style.display = 'none';
+                document.querySelectorAll('[data-section] span').forEach(s => s.style.display = 'none');
+            }
+        });
+
+        // Auth Panel
+        document.getElementById('addAuthUserBtn').addEventListener('click', () => {
+            document.getElementById('newUserForm').classList.toggle('hidden');
+        });
+
+        document.getElementById('cancelUserBtn').addEventListener('click', () => {
+            document.getElementById('newUserForm').classList.add('hidden');
+        });
+
+        document.getElementById('togglePasswordBtn').addEventListener('click', () => {
+            const input = document.getElementById('newUserPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        });
+
+        document.getElementById('createUserBtn').addEventListener('click', () => {
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+
+            if (!email || !password) {
+                showToast('Email and password are required', 'error');
                 return;
             }
 
-            tableBody.innerHTML = items.map(user => `
-                <tr class="hover:bg-[#1a1a1a] transition-colors fade-in">
-                    <td class="px-6 py-4 font-mono text-xs text-brand-400">${user.id}</td>
-                    <td class="px-6 py-4 font-medium text-white">${user.email}</td>
-                    <td class="px-6 py-4 text-gray-500 text-xs">${new Date(user.created).toLocaleString()}</td>
-                    <td class="px-6 py-4 text-gray-500 text-xs">${new Date(user.updated).toLocaleString()}</td>
-                </tr>
-            `).join('');
-        }
+            const newUser = {
+                id: Math.random().toString(36).substr(2, 9),
+                email,
+                status: 'confirmed',
+                created: new Date().toLocaleDateString(),
+                lastSignIn: 'Never'
+            };
 
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            checkAuth();
+            app.users.push(newUser);
+            renderAuthUsers();
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
+            document.getElementById('newUserForm').classList.add('hidden');
+            showToast('User created successfully');
         });
 
+        function renderAuthUsers() {
+            const tbody = document.getElementById('authUsersTable');
+            const searchQuery = document.getElementById('authSearchInput')?.value?.toLowerCase() || '';
+            const filtered = app.users.filter(u => u.email.toLowerCase().includes(searchQuery));
+
+            tbody.innerHTML = filtered.map(user => `
+                <tr class="border-b border-border hover:bg-foreground/5 transition-colors">
+                    <td class="px-6 py-4 text-sm text-foreground">${user.email}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-foreground/70">${user.created}</td>
+                    <td class="px-6 py-4 text-sm flex gap-2">
+                        <button class="p-1 hover:bg-foreground/10 rounded transition-colors copy-btn" data-value="${user.email}" data-label="Email">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/50">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                            </svg>
+                        </button>
+                        <button class="p-1 hover:bg-red-500/10 rounded transition-colors delete-user" data-id="${user.id}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-400">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Attach delete handlers
+            document.querySelectorAll('.delete-user').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    app.users = app.users.filter(u => u.id !== id);
+                    renderAuthUsers();
+                    showToast('User deleted successfully');
+                });
+            });
+        }
+
+        // Search handlers
+        document.getElementById('authSearchInput')?.addEventListener('input', renderAuthUsers);
+        document.getElementById('storageSearchInput')?.addEventListener('input', () => renderStorageFiles());
+
+        // Storage
+        function renderStorageFiles() {
+            const tbody = document.getElementById('storageFilesTable');
+            const searchQuery = document.getElementById('storageSearchInput')?.value?.toLowerCase() || '';
+            const filtered = app.files.filter(f => f.name.toLowerCase().includes(searchQuery));
+
+            tbody.innerHTML = filtered.map((file, idx) => `
+                <tr class="border-b border-border hover:bg-foreground/5 transition-colors">
+                    <td class="px-6 py-4 text-sm flex items-center gap-3">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/50">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                            <polyline points="13 2 13 9 20 9"></polyline>
+                        </svg>
+                        <span class="text-foreground font-medium">${file.name}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-foreground/70">${file.size}</td>
+                    <td class="px-6 py-4 text-sm text-foreground/70">${file.modified}</td>
+                    <td class="px-6 py-4 text-sm flex gap-2">
+                        <button class="p-1 hover:bg-red-500/10 rounded transition-colors delete-file" data-name="${file.name}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-400">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Attach delete handlers
+            document.querySelectorAll('.delete-file').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const name = btn.getAttribute('data-name');
+                    app.files = app.files.filter(f => f.name !== name);
+                    renderStorageFiles();
+                    showToast('File deleted successfully');
+                });
+            });
+        }
+
+        document.getElementById('storageFileInput')?.addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+                app.files.push({
+                    name: file.name,
+                    type: 'file',
+                    size: (file.size / 1024).toFixed(2) + ' KB',
+                    modified: new Date().toLocaleDateString()
+                });
+                renderStorageFiles();
+                showToast('File uploaded successfully');
+                document.getElementById('storageFileInput').value = '';
+            }
+        });
+
+        // Real-time Broadcast
+        document.getElementById('sendBroadcastBtn').addEventListener('click', () => {
+            const channel = document.getElementById('broadcastChannel').value;
+            const message = document.getElementById('broadcastMessage').value;
+
+            if (!message.trim()) {
+                showToast('Message cannot be empty', 'error');
+                return;
+            }
+
+            app.events.unshift({
+                channel,
+                event: 'broadcast',
+                data: message,
+                timestamp: new Date().toLocaleTimeString()
+            });
+
+            document.getElementById('broadcastMessage').value = '';
+            showToast('Message broadcast successfully');
+        });
+
+        // Copy Buttons
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const value = btn.getAttribute('data-value');
+                const label = btn.getAttribute('data-label');
+                navigator.clipboard.writeText(value);
+                showToast(`${label} copied to clipboard`);
+            });
+        });
+
+        // Settings
+        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+            const projectName = document.getElementById('projectNameInput').value;
+            document.querySelector('[data-section="settings"]')?.closest('.sidebar-nav')?.parentElement?.querySelector('[data-section="dashboard"]')?.closest('.sidebar-nav')?.parentElement?.textContent;
+            showToast('Settings saved successfully');
+        });
+
+        document.getElementById('deleteProjectBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                showToast('Project deleted successfully');
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+        });
+
+        // Initialize
+        renderAuthUsers();
+        renderStorageFiles();
+        navigateToSection('dashboard');
+
+        // Update stats display
+        function updateStatsDisplay() {
+            document.querySelectorAll('[data-stat]').forEach(el => {
+                const stat = el.getAttribute('data-stat');
+                el.textContent = app.stats[stat] || 0;
+            });
+        }
+
+        updateStatsDisplay();
+
+        // Mock data simulation
+        setInterval(() => {
+            // Simulate random stat updates
+            app.stats.users = Math.floor(Math.random() * 100);
+            app.stats.requests = Math.floor(Math.random() * 1000);
+            app.stats['active-connections'] = Math.floor(Math.random() * 50);
+            app.stats['events-per-min'] = Math.floor(Math.random() * 100);
+            updateStatsDisplay();
+        }, 5000);
     </script>
 </body>
+
 </html>
