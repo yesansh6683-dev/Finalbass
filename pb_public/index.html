@@ -1583,19 +1583,32 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.21.1/pocketbase.umd.min.js"></script>
 
-<script>
-    // 1. Connection jodo
-    const pb = new PocketBase('https://finalbass.onrender.com');
-
-    // 2. Button dabane par data mango
-    async function loadData() {
-        // Ye aapke database se asli data layega
-        const records = await pb.collection('users').getFullList();
-        console.log(records); 
-        // Yahan code likhenge jo data ko table mein dikhayega
-    }
-</script>
 
 </body>
+    <div id="connection-status" style="position: fixed; top: 0; left: 0; width: 100%; background: orange; color: black; text-align: center; padding: 10px; font-weight: bold; z-index: 9999;">
+    ⏳ Connecting to Database...
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.21.1/pocketbase.umd.min.js"></script>
+
+<script>
+    const statusDiv = document.getElementById('connection-status');
+    const pb = new PocketBase('https://finalbass.onrender.com');
+
+    // Connection Check
+    pb.health.check().then(() => {
+        statusDiv.style.background = "#22c55e"; // Green Color
+        statusDiv.style.color = "white";
+        statusDiv.innerHTML = "✅ SUCCESS: Database Connected!";
+        
+        // 3 second baad patti hata do
+        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+    }).catch((err) => {
+        statusDiv.style.background = "#ef4444"; // Red Color
+        statusDiv.style.color = "white";
+        statusDiv.innerHTML = "❌ CONNECTION FAILED. Check Console.";
+    });
+</script>
+
 
 </html>
